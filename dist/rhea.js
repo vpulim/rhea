@@ -3992,7 +3992,7 @@ types.wrap = function(o) {
         return types.wrap_timestamp(o.getTime());
     } else if (o instanceof Typed) {
         return o;
-    } else if (o instanceof Buffer) {
+    } else if (o instanceof Buffer || o instanceof ArrayBuffer) {
         return types.wrap_binary(o);
     } else if (t === 'undefined' || o === null) {
         return types.Null();
@@ -4839,6 +4839,7 @@ function fromByteArray (uint8) {
 },{}],18:[function(require,module,exports){
 
 },{}],19:[function(require,module,exports){
+(function (Buffer){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -6617,7 +6618,8 @@ function numberIsNaN (obj) {
   return obj !== obj // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":17,"ieee754":23}],20:[function(require,module,exports){
+}).call(this,require("buffer").Buffer)
+},{"base64-js":17,"buffer":19,"ieee754":23}],20:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -9043,7 +9045,12 @@ Container.prototype.dispatch = function(name) {
 };
 
 Container.prototype.connect = function (options) {
-    return new Connection(options, this).connect();
+  this.connection = new Connection(options, this);
+  return this.connection.connect();
+};
+
+Container.prototype.disconnect = function () {
+    this.connection.close();
 };
 
 Container.prototype.create_connection = function (options) {
